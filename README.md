@@ -1,68 +1,71 @@
-# IBM Hackathon GitHub Project Template
+# RayShield AI
 
-This GitHub project template is for IBM Hackathon projects. It includes pre-configured security files to help prevent accidental credential commits and potential account suspension during the hackathon.
+> An agentic security remediation workflow for developers.
 
-## 🚀 Quick Start
+**Detect -> Understand -> Fix -> Test -> Verify**
 
-1. **Use this template to create your project:**
-   - Click "Use this template" button above and select "Create a new repository"
-   - Name your repository
-   - Click "Create repository"
+RayShield is a hackathon MVP that analyzes a controlled demo project, explains real security findings, proposes an approved remediation, and verifies the result with tests and a re-scan.
 
-2. **Clone your new repository:**
+## Repository layout
 
-   ```bash
-   git clone https://github.com/HACKATHON-ORG/your-repo-name.git
-   cd your-repo-name
-   ```
+```text
+RayShield/
+├── frontend/                 # React/Vite interface for the demo
+├── backend/                  # Node.js API and workflow coordinator
+├── scanner/                  # Security detection adapters and rules
+├── agents/
+│   └── remediation/          # Bob-powered remediation boundary
+├── validator/                # Tests, re-scan and verification decision
+├── demo-app/                 # Small controlled app scanned by RayShield
+├── tests/                    # Cross-component fixtures and integration tests
+├── docs/                     # Architecture and demo decisions
+└── README.md
+```
 
-3. **Set up environment variables:**
+## MVP workflow
 
-   ```bash
-   # Copy the example file
-   cp .env.example .env
+1. Select the controlled `demo-app` project.
+2. The scanner returns structured findings.
+3. The backend coordinates analysis and requests a remediation proposal.
+4. A human approves the proposed code diff.
+5. The validator runs tests and a security re-scan.
+6. RayShield displays `FIX VERIFIED` only when every required check passes.
 
-   # Edit .env with your actual credentials
-   # Use your preferred editor (nano, vim, code, etc.)
-   nano .env
-   ```
+## Getting started
 
-4. **Verify .gitignore is working:**
+This is an npm workspace. Install dependencies once Node.js 20+ is available:
 
-   ```bash
-   # This should NOT show .env file
-   git status
+```bash
+npm install
+```
 
-   # This should confirm .env is ignored
-   git check-ignore -v .env
-   ```
+Then run the two services in separate terminals:
 
-5. **Start developing!**
+```bash
+npm run dev:backend
+npm run dev:frontend
+```
 
-## 🔒 Security Features
+The API health check is available at `GET /health` on port `3001` by default.
 
-This template includes:
+## Team ownership
 
-- **`.gitignore`** - Prevents committing credentials and live session files
-- **`.bobignore`** - Prevents AI assistants from logging credentials
-- **`.env.example`** - Template for your environment variables
+| Area | Suggested owner | Responsibility |
+| --- | --- | --- |
+| `frontend/` | Frontend / UX | Dashboard, findings, agent activity, diff and verification screens |
+| `backend/` | Backend / integration | API, workflow state and service integration |
+| `scanner/`, `demo-app/`, `tests/` | Security / QA | Real controlled findings, scanner rules and verification tests |
+| `agents/`, `validator/` | AI / integration | Remediation proposal, test/re-scan orchestration and final status |
 
-## 📋 Before Every Commit
+## Security
 
-Always run this checklist:
+This repository includes pre-configured security files to help prevent accidental credential commits and potential account suspension during the hackathon.
 
-- [ ] Reviewed `git diff` for sensitive data
-- [ ] No hardcoded API keys or passwords
-- [ ] `.env` file is NOT in staged changes
-- [ ] No files with "credential" or "secret" in name
-- [ ] Used environment variables for all credentials
+Read [SECURITY.MD](SECURITY.MD) before committing. Never commit `.env` files or credentials, and never place credentials in AI prompts. Copy `.env.example` to `.env` locally and add real values only on your machine.
 
-## 🆘 Need Help?
+## Near-term milestones
 
-- Read [SECURITY.md](SECURITY.MD) for detailed guidelines
-- Contact hackathon support through mentor channel
-- Ask in the hackathon Slack workspace
-
----
-
-**Remember:** Security is everyone's responsibility. When in doubt, ask for help!
+1. Implement one controlled SQL-injection finding end-to-end.
+2. Show an approval gate and before/after diff.
+3. Run a test plus re-scan and emit `FIX VERIFIED` or `NOT VERIFIED`.
+4. Add XSS and hardcoded-secret scenarios only after the first loop is reliable.
