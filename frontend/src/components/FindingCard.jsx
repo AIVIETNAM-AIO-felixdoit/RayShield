@@ -1,0 +1,3 @@
+export default function FindingCard({ finding, selected, onSelect }) {
+  return <button className={`finding-card ${selected ? "selected" : ""}`} onClick={onSelect}><div className="finding-card-top"><span className={`severity severity-${finding.severity.toLowerCase()}`}>{finding.severity}</span><span className="finding-status">{finding.status}</span></div><h3>{finding.name}</h3><p className="finding-location">{finding.file}<span>:{finding.line}</span></p><p className="finding-description">{finding.description}</p><span className="view-details">View details <span>↗</span></span></button>;
+}

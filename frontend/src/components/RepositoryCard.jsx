@@ -1,0 +1,4 @@
+export default function RepositoryCard({ status, onAnalyze }) {
+  const isRunning = status === "Analysis running";
+  return <section className="repository-card panel"><div className="repo-icon">⌘</div><div className="repo-copy"><p className="label">Repository</p><h2>demo-app</h2><p className="repo-path">/workspace/demo-app <span>·</span> main</p></div><div className="repo-status"><p className="label">Status</p><strong className={isRunning ? "is-running" : ""}><span className="mini-dot" />{status}</strong></div><button className="primary-button" onClick={onAnalyze} disabled={isRunning}>{isRunning ? "Analyzing..." : "Analyze Repository"}<span>→</span></button></section>;
+}
