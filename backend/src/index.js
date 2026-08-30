@@ -120,12 +120,15 @@ app.post("/api/findings/:findingId/remediation", async (request, response) => {
     return response.status(404).json({ error: "Finding not found in this review." });
   }
 
-  // Read the source file for context and diff generation
+  // Read the source file for context and diff generation.
+  // finding.file is relative to the project path (e.g. "src\db\queries.js"),
+  // so we must resolve it against review.projectPath to get the absolute path.
+  const absFilePath = resolve(review.projectPath, finding.file);
   let source = "";
   try {
-    source = await readFile(finding.file, "utf8");
+    source = await readFile(absFilePath, "utf8");
   } catch {
-    source = `[source file not readable: ${finding.file}]`;
+    source = `[source file not readable: ${absFilePath}]`;
   }
 
   // Try the deterministic provider first
@@ -323,12 +326,14 @@ app.post("/api/findings/:findingId/apply", async (request, response) => {
     });
   }
 
-  // Write the fixed source to disk
+  // Write the fixed source to disk.
+  // Resolve finding.file relative to the project path (same logic as readFile above).
+  const absApplyPath = resolve(review.projectPath, finding.file);
   try {
-    await writeFile(finding.file, proposal.fixedSource, "utf8");
+    await writeFile(absApplyPath, proposal.fixedSource, "utf8");
   } catch (err) {
     return response.status(500).json({
-      error: `Failed to write fix to ${finding.file}: ${err.message}`,
+      error: `Failed to write fix to ${absApplyPath}: ${err.message}`,
     });
   }
 
