@@ -2,5 +2,7 @@ const agentMeta = { code: { name: "Code Agent", description: "Analyzes applicati
 
 export default function AgentCard({ type, status }) {
   const agent = agentMeta[type];
-  return <article className={`agent-card ${status.toLowerCase()}`}><div className="agent-top"><span className="agent-mark">{agent.mark}</span><span className="agent-status"><span className="mini-dot" />{status}</span></div><h3>{agent.name}</h3><p>{agent.description}</p><div className="agent-scan"><span className="scan-line" /></div></article>;
+  const statusStr = status || "Ready";
+  const statusClass = statusStr.toLowerCase().replace(/\s+/g, "-");
+  return <article className={`agent-card ${statusClass}`}><div className="agent-top"><span className="agent-mark">{agent.mark}</span><span className="agent-status"><span className="mini-dot" />{statusStr}</span></div><h3>{agent.name}</h3><p>{agent.description}</p><div className="agent-scan"><span className="scan-line" /></div></article>;
 }
