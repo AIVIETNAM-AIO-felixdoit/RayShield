@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite",
+    "build": "vite build",
     "test": "echo \"Frontend tests will be added with the UI\""
   },
   "dependencies": {
