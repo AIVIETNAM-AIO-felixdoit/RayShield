@@ -44,13 +44,26 @@ export function buildProposal(finding, source) {
 // Fix:     replace with parameterised query placeholder
 
 function fixSqlInjection(finding, source) {
-  // Match: `SELECT * FROM users WHERE id = ${id}` or similar template-literal SQL.
-  // Replacement preserves text after the interpolation and produces valid JS:
-  //   db.query(`SELECT ... ${id}`)  →  db.query("SELECT ... ?", [id])
-  // The backtick template literal is replaced in-place; the surrounding call is untouched.
-  const fixed = source.replace(
-    /`([^`]*SELECT[^`]*)\$\{(\w+)\}([^`]*)`/gi,
+  // Pass 1: fix template-literal SQL with interpolated variable.
+  //   `SELECT ... ${id}` → "SELECT ... ?", [id]
+  let fixed = source.replace(
+    /`([^`]*\b(?:SELECT|INSERT|UPDATE|DELETE|FROM|WHERE)\b[^`]*)\$\{(\w+)\}([^`]*)`/gi,
     (_match, before, varName, after) =>
+      `"${before}?${after}", [${varName}]`
+  );
+
+  // Pass 2: fix string-concatenation SQL with a variable operand.
+  //   "SELECT ... '" + status + "'"  →  "SELECT ... ?", [status]
+  //   Uses a two-part match: SQL prefix (double- or single-quoted) + varName + suffix (any quoted literal).
+  fixed = fixed.replace(
+    /("([^"]*\b(?:SELECT|INSERT|UPDATE|DELETE|FROM|WHERE)\b[^"]*)")\s*\+\s*(\w+)\s*\+\s*("([^"]*)")/gi,
+    (_match, _prefix, before, varName, _suffix, after) =>
+      `"${before}?${after}", [${varName}]`
+  );
+  // Same for single-quoted SQL prefix
+  fixed = fixed.replace(
+    /('([^']*\b(?:SELECT|INSERT|UPDATE|DELETE|FROM|WHERE)\b[^']*)')\s*\+\s*(\w+)\s*\+\s*('([^']*)')/gi,
+    (_match, _prefix, before, varName, _suffix, after) =>
       `"${before}?${after}", [${varName}]`
   );
 

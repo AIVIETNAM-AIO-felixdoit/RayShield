@@ -855,7 +855,8 @@ describe("Real vertical slice: SQL injection end-to-end with real scanner", () =
       assert.equal(applyRes.body.file, sqlFinding.file, "Apply must report the correct file path");
 
       // ── Step 7: Confirm source file actually changed on disk ──────────────
-      const fixedSource = await readFile(sqlFinding.file, "utf8");
+      // finding.file is relative to the project path — resolve before reading
+      const fixedSource = await readFile(join(tmpProjectDir, sqlFinding.file), "utf8");
       // The interpolated ${...} must be gone from the SQL query line
       const sqlLineVulnerable = fixedSource
         .split("\n")

@@ -400,6 +400,8 @@ app.post("/api/findings/:findingId/validate", async (request, response) => {
   // ── Check 2: Syntax check the fixed file ──────────────────────────────────
   // Run `node --check <file>` to verify the applied fix is syntactically valid JS.
   // Only meaningful for .js files; skip gracefully for other file types.
+  // Resolve finding.file against projectPath for the syntax check (same as readFile/writeFile above).
+  const absSyntaxPath = resolve(review.projectPath, finding.file);
   const syntaxCheck = await new Promise((resolveCheck) => {
     if (!wasApplied || !finding.file.endsWith(".js")) {
       resolveCheck({
@@ -411,7 +413,7 @@ app.post("/api/findings/:findingId/validate", async (request, response) => {
       });
       return;
     }
-    execFile(process.execPath, ["--check", finding.file], (err) => {
+    execFile(process.execPath, ["--check", absSyntaxPath], (err) => {
       if (err) {
         resolveCheck({
           name: "syntax-check",
